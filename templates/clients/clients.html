@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <h1 class="display-5 fw-bold">Clients list here</h1>
+
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Sector</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.sector }}</td>
+
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No clients yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+    </div>
+{% endblock %}
