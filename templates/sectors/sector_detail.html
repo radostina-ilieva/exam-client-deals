@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Sectors{% endblock %}
+{% block title %}{{ object.name }}{% endblock %}
 
 {% block content %}
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <h1 class="display-5 fw-bold">Sector detail here</h1>
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <h1 class="h2 fw-bold mb-4">{{ object.name }}</h1>
 
+        <h2 class="h5">Clients in this sector</h2>
+        <ul class="list-group mb-4">
+            {% for client in object.clients.all %}
+                <li class="list-group-item">
+                    <a href="{% url 'clients:client-detail' client.pk %}">{{ client.name }}</a>
+                </li>
+            {% empty %}
+                <li class="list-group-item text-muted">No clients in this sector yet.</li>
+            {% endfor %}
+        </ul>
 
-
+        <a href="{% url 'clients:sector-edit' object.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'clients:sector-delete' object.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'clients:sector-list' %}" class="btn btn-outline-secondary">Back to sectors</a>
     </div>
 {% endblock %}

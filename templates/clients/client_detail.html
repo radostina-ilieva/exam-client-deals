@@ -1,12 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}Clients{% endblock %}
+{% block title %}{{ object.name }}{% endblock %}
 
 {% block content %}
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <h1 class="display-5 fw-bold">Client detail here</h1>
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-4">{{ object.name }}</h1>
 
+        <dl class="row">
+            <dt class="col-sm-3">Client name</dt>
+            <dd class="col-sm-9">{{ object.name }}</dd>
 
+            <dt class="col-sm-3">Sector</dt>
+            <dd class="col-sm-9">{{ object.sector }}</dd>
+        </dl>
 
+        <a href="{% url 'clients:client-edit' object.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'clients:client-delete' object.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'clients:client-list' %}" class="btn btn-outline-secondary">Back to clients</a>
     </div>
 {% endblock %}

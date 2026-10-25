@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Sectors{% endblock %}
+{% block title %}Delete sector{% endblock %}
 
 {% block content %}
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <h1 class="display-5 fw-bold">Delete Sector form</h1>
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-3">Delete sector</h1>
+        <p class="text-danger">Are you sure you want to delete this sector? This action cannot be undone.</p>
+        {% if object.clients.exists %}
+            <div class="alert alert-warning">
+                This sector has {{ object.clients.count }} client(s), so it cannot be deleted until they are reassigned or deleted.
+            </div>
+        {% endif %}
 
+        <form method="post">
+            {% csrf_token %}
+            {% include 'partials/_form_fields.html' %}
 
-
+            <button type="submit" class="btn btn-danger">Yes, delete</button>
+            <a href="{% url 'clients:sector-detail' object.pk %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
     </div>
 {% endblock %}

@@ -3,10 +3,54 @@
 {% block title %}Sectors{% endblock %}
 
 {% block content %}
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <h1 class="display-5 fw-bold">SECTORS to be loaded here later</h1>
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Sectors</h1>
+            <a href="{% url 'clients:sector-create' %}" class="btn btn-primary">+ Add sector</a>
+        </div>
 
+        <form method="get" class="row g-2 mb-3">
+            <div class="col">
+                <input type="search" name="q" value="{{ q }}" class="form-control"
+                       placeholder="Search sectors by name..." aria-label="Search sectors by name">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if q %}
+                    <a href="{% url 'clients:sector-list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
 
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Sector Name</th>
+                    <th>Clients</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sector in sectors %}
+                    <tr>
+                        <td><a href="{% url 'clients:sector-detail' sector.pk %}">{{ sector.name }}</a></td>
+                        <td>{{ sector.client_count }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'clients:sector-detail' sector.pk %}" class="btn btn-sm btn-outline-secondary">Details</a>
+                            <a href="{% url 'clients:sector-edit' sector.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'clients:sector-delete' sector.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            {% if q %}No sectors match "{{ q }}".{% else %}No sectors yet.{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
+        {% include 'partials/_pagination.html' %}
     </div>
 {% endblock %}
