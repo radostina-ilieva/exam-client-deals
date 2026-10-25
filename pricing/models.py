@@ -5,6 +5,8 @@ from django.core.validators import MaxValueValidator, MinLengthValidator, MinVal
 
 from decimal import Decimal
 
+from pricing.exceptions import IndexBandNotFound
+
 # Helping classes
 class Month(models.IntegerChoices):
     JAN = 1, 'Jan'
@@ -21,22 +23,8 @@ class Month(models.IntegerChoices):
     DEC = 12, 'Dec'
 
 class PriceIndexType(models.TextChoices):
-    PT = 'PT', 'PT'
+    PT = 'PT', 'Prime time'
     CHANNEL_SPLIT = 'CHANNEL_SPLIT', 'Channel split'
-
-
-# Custom Exception
-class IndexBandNotFound(Exception):
-    """No index range found for the given year, type, and percentage."""
-
-    def __init__(self, pricing_year, index_type, percent):
-        self.pricing_year = pricing_year
-        self.index_type = index_type
-        self.percent = percent
-        super().__init__(
-            f'Missing index for year {pricing_year}, '
-            f'Type "{index_type}" & percent {percent}.'
-        )
 
 
 # Models
@@ -136,15 +124,17 @@ class MonthlyCoefficient(models.Model):
     month = models.PositiveSmallIntegerField(
         choices=Month.choices,
     )
-    coefficient = models.PositiveSmallIntegerField(
+    coefficient = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
         validators=[
-            MinValueValidator(80),
-            MaxValueValidator(250)
+            MinValueValidator('0.80'),
+            MaxValueValidator('2.50')
         ],
     )
 
     class Meta:
-        ordering = ['pricing_year', 'month']
+        ordering = ['-pricing_year__year', 'month']
         constraints = [
             models.UniqueConstraint(
                 fields=['pricing_year', 'month'],
@@ -183,7 +173,9 @@ class IndexBand(models.Model):
         max_length=20,
         choices=PriceIndexType.choices,
     )
-    upper_limit = models.PositiveSmallIntegerField(
+    upper_limit = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
         validators=[
             MinValueValidator(Decimal('0')),
             MaxValueValidator(Decimal('100')),
@@ -199,12 +191,12 @@ class IndexBand(models.Model):
     objects = IndexBandQuerySet.as_manager()
 
     class Meta:
-        ordering = ['pricing_year', 'index_type', 'upper_limit']
+        ordering = ['-pricing_year__year', 'index_type', 'upper_limit']
         constraints = [
             models.UniqueConstraint(
                 fields=['pricing_year', 'index_type', 'upper_limit'],
                 name='unique_index_band_per_year_type_limit',
-                violation_error_message='A band with this upper limit already exists..',
+                violation_error_message='A band with this upper limit already exists.',
             ),
             models.CheckConstraint(
                 condition=Q(upper_limit__gte=0) & Q(upper_limit__lte=100),
@@ -215,7 +207,7 @@ class IndexBand(models.Model):
     def __str__(self):
         return (
             f'{self.pricing_year} / {self.get_index_type_display()}: '
-            f'до {self.upper_limit}% → {self.coefficient}'
+            f'up to {self.upper_limit}% → {self.coefficient}'
         )
 
     @classmethod
