@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Channels{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Channels</h1>
+            <a href="{% url 'pricing:channel-create' %}" class="btn btn-primary">+ Add channel</a>
+        </div>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col">
+                <input type="search" name="q" value="{{ q }}" class="form-control"
+                       placeholder="Search channels by name..." aria-label="Search channels by name">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if q %}
+                    <a href="{% url 'pricing:channel-list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>Target groups</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel in channels %}
+                    <tr>
+                        <td>{{ channel.name }}</td>
+                        <td>{{ channel.groups_count }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'pricing:channel-edit' channel.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'pricing:channel-delete' channel.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            {% if q %}No channels match "{{ q }}".{% else %}No channels yet.{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% include 'partials/_pagination.html' %}
+
+        <a href="{% url 'pricing:home' %}" class="btn btn-outline-secondary mt-3">Back to pricing</a>
+    </div>
+{% endblock %}

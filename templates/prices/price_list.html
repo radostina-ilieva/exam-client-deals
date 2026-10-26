@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load pricing_extras %}
+
+{% block title %}Base prices{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Base prices</h1>
+            <a href="{% url 'pricing:price-create' %}{% if selected_year %}?year={{ selected_year }}{% endif %}" class="btn btn-primary">+ Add price</a>
+        </div>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <select name="year" class="form-select" aria-label="Filter by year">
+                    <option value="">All years</option>
+                    {% for year in years %}
+                        <option value="{{ year.pk }}" {% if year.pk == selected_year %}selected{% endif %}>{{ year.year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="group" class="form-select" aria-label="Filter by target group">
+                    <option value="">All target groups</option>
+                    {% for group in groups %}
+                        <option value="{{ group.pk }}" {% if group.pk == selected_group %}selected{% endif %}>{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="ordering" class="form-select" aria-label="Sort by">
+                    <option value="" {% if not ordering %}selected{% endif %}>Default order</option>
+                    <option value="group" {% if ordering == 'group' %}selected{% endif %}>Target group A-Z</option>
+                    <option value="-group" {% if ordering == '-group' %}selected{% endif %}>Target group Z-A</option>
+                    <option value="price" {% if ordering == 'price' %}selected{% endif %}>Price low to high</option>
+                    <option value="-price" {% if ordering == '-price' %}selected{% endif %}>Price high to low</option>
+                    <option value="year" {% if ordering == 'year' %}selected{% endif %}>Year oldest first</option>
+                    <option value="-year" {% if ordering == '-year' %}selected{% endif %}>Year newest first</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Apply</button>
+                {% if selected_year or selected_group or ordering %}
+                    <a href="{% url 'pricing:price-list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Target group</th>
+                    <th class="text-end">Base price</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price in prices %}
+                    <tr>
+                        <td><a href="{% url 'pricing:year-detail' price.pricing_year.pk %}">{{ price.pricing_year }}</a></td>
+                        <td><a href="{% url 'pricing:group-detail' price.target_group.pk %}">{{ price.target_group }}</a></td>
+                        <td class="text-end">{{ price.base_price|money }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'pricing:price-edit' price.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'pricing:price-delete' price.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No prices found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% include 'partials/_pagination.html' %}
+
+        <a href="{% url 'pricing:home' %}" class="btn btn-outline-secondary mt-3">Back to pricing</a>
+    </div>
+{% endblock %}

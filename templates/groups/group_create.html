@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Create target group{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-4">Create new target group</h1>
+
+        {% if not has_channels %}
+            <div class="alert alert-warning">
+                A target group needs at least one channel, and there are no channels yet.
+                <a href="{% url 'pricing:channel-create' %}" class="alert-link">Create a channel first</a>.
+            </div>
+            <a href="{% url 'pricing:group-list' %}" class="btn btn-outline-secondary">Back to target groups</a>
+        {% else %}
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'partials/_form_fields.html' %}
+
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="{% url 'pricing:group-list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

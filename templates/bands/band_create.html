@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Create band{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-4">Create new index band</h1>
+
+        {% if not has_years %}
+            <div class="alert alert-warning">
+                A band belongs to a pricing year, and there are no years yet.
+                <a href="{% url 'pricing:year-create' %}" class="alert-link">Create a year first</a>.
+            </div>
+            <a href="{% url 'pricing:band-list' %}" class="btn btn-outline-secondary">Back to bands</a>
+        {% else %}
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'partials/_form_fields.html' %}
+
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="{% url 'pricing:band-list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit channel{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-4">Edit channel: {{ object.name }}</h1>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include 'partials/_form_fields.html' %}
+
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <a href="{% url 'pricing:channel-list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load pricing_extras %}
+
+{% block title %}Year {{ object.year }}{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Year {{ object.year }}</h1>
+            <div>
+                <a href="{% url 'pricing:calculator' %}?year={{ object.pk }}" class="btn btn-success">Open calculator</a>
+                <a href="{% url 'pricing:year-coefficients' object.pk %}" class="btn btn-primary">Edit coefficients</a>
+                <a href="{% url 'pricing:year-delete' object.pk %}" class="btn btn-outline-danger">Delete</a>
+            </div>
+        </div>
+
+        {% for warning in warnings %}
+            <div class="alert alert-warning">{{ warning }}</div>
+        {% empty %}
+            <div class="alert alert-success">This year is ready for the calculator.</div>
+        {% endfor %}
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <h2 class="h5">Base prices</h2>
+                <table class="table table-sm table-striped align-middle">
+                    <thead><tr><th>Target group</th><th class="text-end">Base price</th></tr></thead>
+                    <tbody>
+                        {% for price in prices %}
+                            <tr>
+                                <td><a href="{% url 'pricing:group-detail' price.target_group.pk %}">{{ price.target_group }}</a></td>
+                                <td class="text-end">{{ price.base_price|money }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="2" class="text-muted text-center">No prices for this year.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{% url 'pricing:price-create' %}?year={{ object.pk }}" class="btn btn-sm btn-outline-primary">+ Add price</a>
+                <a href="{% url 'pricing:price-list' %}?year={{ object.pk }}" class="btn btn-sm btn-outline-secondary">All prices of the year</a>
+            </div>
+
+            <div class="col-lg-6">
+                <h2 class="h5">Monthly coefficients</h2>
+                <table class="table table-sm table-striped align-middle">
+                    <thead><tr><th>Month</th><th class="text-end">Coefficient</th></tr></thead>
+                    <tbody>
+                        {% for month in months %}
+                            <tr>
+                                <td>{{ month.label }}</td>
+                                <td class="text-end">
+                                    {% if month.coefficient is None %}
+                                        <span class="badge bg-warning text-dark">missing</span>
+                                    {% else %}
+                                        {{ month.coefficient }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h2 class="h5 mt-4">Index bands</h2>
+        <div class="row g-4">
+            {% for group in band_groups %}
+                <div class="col-lg-6">
+                    <h3 class="h6">{{ group.label }}</h3>
+                    <table class="table table-sm table-striped align-middle">
+                        <thead><tr><th>Up to</th><th class="text-end">Coefficient</th></tr></thead>
+                        <tbody>
+                            {% for band in group.bands %}
+                                <tr>
+                                    <td>{{ band.upper_limit|percent }}</td>
+                                    <td class="text-end">{{ band.coefficient }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="text-muted text-center">No bands.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{% url 'pricing:band-create' %}?year={{ object.pk }}&type={{ group.value }}" class="btn btn-sm btn-outline-primary">+ Add band</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'pricing:year-list' %}" class="btn btn-outline-secondary mt-4">Back to years</a>
+    </div>
+{% endblock %}

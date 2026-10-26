@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load pricing_extras %}
+
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <h1 class="h2 fw-bold mb-4">{{ object.name }}</h1>
+
+        <div class="row g-4">
+            <div class="col-md-5">
+                <h2 class="h5">Channels</h2>
+                <ul class="list-group mb-3">
+                    {% for channel in channels %}
+                        <li class="list-group-item">{{ channel.name }}</li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No channels.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-md-7">
+                <h2 class="h5">Prices by year</h2>
+                <table class="table table-sm table-striped align-middle">
+                    <thead><tr><th>Year</th><th class="text-end">Base price</th><th></th></tr></thead>
+                    <tbody>
+                        {% for price in prices %}
+                            <tr>
+                                <td><a href="{% url 'pricing:year-detail' price.pricing_year.pk %}">{{ price.pricing_year }}</a></td>
+                                <td class="text-end">{{ price.base_price|money }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'pricing:price-edit' price.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-muted text-center">No prices yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{% url 'pricing:price-create' %}?group={{ object.pk }}" class="btn btn-sm btn-outline-primary">+ Add price</a>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'pricing:group-edit' object.pk %}" class="btn btn-primary">Edit</a>
+            <a href="{% url 'pricing:group-delete' object.pk %}" class="btn btn-danger">Delete</a>
+            <a href="{% url 'pricing:group-list' %}" class="btn btn-outline-secondary">Back to target groups</a>
+        </div>
+    </div>
+{% endblock %}

@@ -33,3 +33,11 @@ class MissingCoefficientError(PricingError):
         super().__init__(
             f'No monthly coefficient for month {month} for {pricing_year} year.'
         )
+
+class InvalidPercentError(PricingError):
+    """A percentage is outside the allowed 0-100 range."""
+
+    def __init__(self, name, percent):
+        self.name = name
+        self.percent = percent
+        super().__init__(f'{name} must be between 0 and 100, got {percent}.')

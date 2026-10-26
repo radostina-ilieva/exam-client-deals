@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing years{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Pricing years</h1>
+            <a href="{% url 'pricing:year-create' %}" class="btn btn-primary">+ Create year</a>
+        </div>
+
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Prices</th>
+                    <th>Months</th>
+                    <th>Bands</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for year in years %}
+                    <tr>
+                        <td><a href="{% url 'pricing:year-detail' year.pk %}">{{ year.year }}</a></td>
+                        <td>{{ year.prices_count }}</td>
+                        <td>
+                            <span class="badge {% if year.coefficients_count == 12 %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                {{ year.coefficients_count }} of 12
+                            </span>
+                        </td>
+                        <td>{{ year.bands_count }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'pricing:year-detail' year.pk %}" class="btn btn-sm btn-outline-secondary">Details</a>
+                            <a href="{% url 'pricing:year-coefficients' year.pk %}" class="btn btn-sm btn-outline-primary">Edit coefficients</a>
+                            <a href="{% url 'pricing:year-delete' year.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No pricing years yet. <a href="{% url 'pricing:year-create' %}">Create the first one.</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% include 'partials/_pagination.html' %}
+
+        <a href="{% url 'pricing:home' %}" class="btn btn-outline-secondary mt-3">Back to pricing</a>
+    </div>
+{% endblock %}

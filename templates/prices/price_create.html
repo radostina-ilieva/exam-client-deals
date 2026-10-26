@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Create price{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-4">Create new price</h1>
+
+        {% if not has_years or not has_groups %}
+            <div class="alert alert-warning">
+                A price needs a pricing year and a target group.
+                <ul class="mb-0">
+                    {% if not has_years %}
+                        <li><a href="{% url 'pricing:year-create' %}" class="alert-link">Create a pricing year</a></li>
+                    {% endif %}
+                    {% if not has_groups %}
+                        <li><a href="{% url 'pricing:group-create' %}" class="alert-link">Create a target group</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <a href="{% url 'pricing:price-list' %}" class="btn btn-outline-secondary">Back to prices</a>
+        {% else %}
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'partials/_form_fields.html' %}
+
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="{% url 'pricing:price-list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

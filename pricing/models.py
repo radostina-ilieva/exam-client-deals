@@ -7,6 +7,11 @@ from decimal import Decimal
 
 from pricing.exceptions import IndexBandNotFound
 
+# Allowed range of a monthly coefficient.
+MIN_MONTHLY_COEFFICIENT = Decimal('0.80')
+MAX_MONTHLY_COEFFICIENT = Decimal('2.50')
+
+
 # Helping classes
 class Month(models.IntegerChoices):
     JAN = 1, 'Jan'
@@ -128,8 +133,8 @@ class MonthlyCoefficient(models.Model):
         max_digits=3,
         decimal_places=2,
         validators=[
-            MinValueValidator('0.80'),
-            MaxValueValidator('2.50')
+            MinValueValidator(MIN_MONTHLY_COEFFICIENT),
+            MaxValueValidator(MAX_MONTHLY_COEFFICIENT),
         ],
     )
 
@@ -213,3 +218,4 @@ class IndexBand(models.Model):
     @classmethod
     def get_coefficient(cls, pricing_year, index_type, percent):
         return cls.objects.for_percent(pricing_year, index_type, percent).coefficient
+

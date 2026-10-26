@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Target groups{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Target groups</h1>
+            <a href="{% url 'pricing:group-create' %}" class="btn btn-primary">+ Add target group</a>
+        </div>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col">
+                <input type="search" name="q" value="{{ q }}" class="form-control"
+                       placeholder="Search target groups by name..." aria-label="Search target groups by name">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if q %}
+                    <a href="{% url 'pricing:group-list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Target group</th>
+                    <th>Channels</th>
+                    <th>Prices</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td><a href="{% url 'pricing:group-detail' group.pk %}">{{ group.name }}</a></td>
+                        <td>{{ group.channels.all|join:", " }}</td>
+                        <td>{{ group.prices_count }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'pricing:group-detail' group.pk %}" class="btn btn-sm btn-outline-secondary">Details</a>
+                            <a href="{% url 'pricing:group-edit' group.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'pricing:group-delete' group.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            {% if q %}No target groups match "{{ q }}".{% else %}No target groups yet.{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% include 'partials/_pagination.html' %}
+
+        <a href="{% url 'pricing:home' %}" class="btn btn-outline-secondary mt-3">Back to pricing</a>
+    </div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class DealItemsConfig(AppConfig):
+class PricingConfig(AppConfig):
     name = 'pricing'

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing | Deals Calculator{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <h1 class="h2">Pricing</h1>
+        <p class="lead mb-1">Set up the price data once per year, then calculate prices.</p>
+        <p class="text-muted mb-0">
+            Base price &times; Prime time index &times; Channel split index
+            &times; Monthly coefficient = Monthly price. The average of the 12 months is the average year price.
+        </p>
+    </div>
+
+    {% if not setup_complete %}
+        <div class="alert alert-warning">
+            Some setup steps are not finished yet. The calculator needs all of them.
+        </div>
+    {% endif %}
+
+    <ol class="list-group list-group-numbered mb-4">
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Pricing year</div>
+                Create the year you want to price, for example 2027.
+            </div>
+            <span class="badge {% if counts.years %}bg-success{% else %}bg-secondary{% endif %} me-3">
+                {{ counts.years }} year{{ counts.years|pluralize }}
+            </span>
+            <a class="btn btn-sm btn-primary" href="{% url 'pricing:year-list' %}">Manage</a>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Channels</div>
+                The TV channels that can be sold.
+            </div>
+            <span class="badge {% if counts.channels %}bg-success{% else %}bg-secondary{% endif %} me-3">
+                {{ counts.channels }}
+            </span>
+            <a class="btn btn-sm btn-primary" href="{% url 'pricing:channel-list' %}">Manage</a>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Target groups</div>
+                Audiences you sell to, with the channels available for each.
+            </div>
+            <span class="badge {% if counts.groups %}bg-success{% else %}bg-secondary{% endif %} me-3">
+                {{ counts.groups }}
+            </span>
+            <a class="btn btn-sm btn-primary" href="{% url 'pricing:group-list' %}">Manage</a>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Base prices</div>
+                One base price per target group for a year.
+                {% if not has_year %}<div class="text-muted small">Create a pricing year first.</div>{% endif %}
+            </div>
+            <span class="badge {% if counts.prices %}bg-success{% else %}bg-secondary{% endif %} me-3">
+                {{ counts.prices }}
+            </span>
+            {% if has_year %}
+                <a class="btn btn-sm btn-primary" href="{% url 'pricing:price-list' %}">Manage</a>
+            {% endif %}
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Monthly coefficients</div>
+                The 12 monthly coefficients of a year.
+                {% if not has_year %}<div class="text-muted small">Create a pricing year first.</div>{% endif %}
+            </div>
+            <span class="badge {% if counts.coefficients %}bg-success{% else %}bg-secondary{% endif %} me-3">
+                {{ counts.coefficients }}
+            </span>
+            {% if has_year %}
+                <a class="btn btn-sm btn-primary" href="{% url 'pricing:year-list' %}">Choose a year</a>
+            {% endif %}
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Index bands</div>
+                Prime time and channel split indexes, as ranges "up to X%".
+                {% if not has_year %}<div class="text-muted small">Create a pricing year first.</div>{% endif %}
+            </div>
+            <span class="badge {% if counts.bands %}bg-success{% else %}bg-secondary{% endif %} me-3">
+                {{ counts.bands }}
+            </span>
+            {% if has_year %}
+                <a class="btn btn-sm btn-primary" href="{% url 'pricing:band-list' %}">Manage</a>
+            {% endif %}
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Price calculator</div>
+                See the base price, the adjusted price, the 12 monthly prices and the average year price.
+            </div>
+            <a class="btn btn-sm btn-success" href="{% url 'pricing:calculator' %}">Open</a>
+        </li>
+    </ol>
+{% endblock %}

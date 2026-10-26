@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load pricing_extras %}
+
+{% block title %}Index bands{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 fw-bold mb-0">Index bands</h1>
+            <a href="{% url 'pricing:band-create' %}?{% if selected_year %}year={{ selected_year }}&{% endif %}{% if selected_type %}type={{ selected_type }}{% endif %}" class="btn btn-primary">+ Add band</a>
+        </div>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <select name="year" class="form-select" aria-label="Filter by year">
+                    <option value="">All years</option>
+                    {% for year in years %}
+                        <option value="{{ year.pk }}" {% if year.pk == selected_year %}selected{% endif %}>{{ year.year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="type" class="form-select" aria-label="Filter by index type">
+                    <option value="">All types</option>
+                    {% for value, label in index_types %}
+                        <option value="{{ value }}" {% if value == selected_type %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">Apply</button>
+                {% if selected_year or selected_type %}
+                    <a href="{% url 'pricing:band-list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Type</th>
+                    <th>Up to</th>
+                    <th class="text-end">Coefficient</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for band in bands %}
+                    <tr>
+                        <td><a href="{% url 'pricing:year-detail' band.pricing_year.pk %}">{{ band.pricing_year }}</a></td>
+                        <td>{{ band.get_index_type_display }}</td>
+                        <td>{{ band.upper_limit|percent }}</td>
+                        <td class="text-end">{{ band.coefficient }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'pricing:band-delete' band.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No bands found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% include 'partials/_pagination.html' %}
+
+        <a href="{% url 'pricing:home' %}" class="btn btn-outline-secondary mt-3">Back to pricing</a>
+    </div>
+{% endblock %}

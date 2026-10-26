@@ -1,0 +1,81 @@
+{% load pricing_extras %}
+{# Expects `result` (a PriceBreakdown from pricing.services.calculate). #}
+
+{# Block 1: parameters #}
+<div class="card mb-4">
+    <div class="card-header fw-semibold">1. Parameters</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Pricing year</dt>
+            <dd class="col-sm-8">{{ result.pricing_year }}</dd>
+
+            <dt class="col-sm-4">Target group</dt>
+            <dd class="col-sm-8">{{ result.target_group }}</dd>
+
+            <dt class="col-sm-4">Prime time share</dt>
+            <dd class="col-sm-8">{{ result.pt_percent|percent }}</dd>
+
+            <dt class="col-sm-4">Main channel share</dt>
+            <dd class="col-sm-8">{{ result.main_channel_percent|percent }}</dd>
+        </dl>
+    </div>
+</div>
+
+{# Block 2: base x PT x split = adjusted #}
+<div class="card mb-4">
+    <div class="card-header fw-semibold">2. Adjusted price</div>
+    <div class="card-body">
+        <div class="row text-center align-items-center g-2">
+            <div class="col">
+                <div class="small text-muted">Base price</div>
+                <div class="fs-5">{{ result.base_price|money }}</div>
+            </div>
+            <div class="col-auto fs-4">&times;</div>
+            <div class="col">
+                <div class="small text-muted">Prime time index</div>
+                <div class="fs-5">{{ result.pt_index|floatformat:2 }}</div>
+            </div>
+            <div class="col-auto fs-4">&times;</div>
+            <div class="col">
+                <div class="small text-muted">Channel split index</div>
+                <div class="fs-5">{{ result.split_index|floatformat:2 }}</div>
+            </div>
+            <div class="col-auto fs-4">=</div>
+            <div class="col">
+                <div class="small text-muted">Adjusted price</div>
+                <div class="fs-5 fw-bold">{{ result.adjusted_price|money }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Block 3: 12 months #}
+<div class="card mb-4">
+    <div class="card-header fw-semibold">3. Monthly prices</div>
+    <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th class="text-end">Coefficient</th>
+                    <th class="text-end">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in result.months %}
+                    <tr>
+                        <td>{% month_name row.month %}</td>
+                        <td class="text-end">{{ row.coefficient|floatformat:2 }}</td>
+                        <td class="text-end">{{ row.price|money }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Block 4: average year price #}
+<div class="alert alert-success d-flex justify-content-between align-items-center fs-4 mb-0" role="status">
+    <span>Average year price</span>
+    <strong>{{ result.average_price|money }}</strong>
+</div>

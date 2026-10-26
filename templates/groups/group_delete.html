@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete target group{% endblock %}
+
+{% block content %}
+    <div class="p-4 mb-4 bg-light rounded-3 form-card">
+        <h1 class="h2 fw-bold mb-3">Delete target group</h1>
+        <p class="text-danger">Are you sure you want to delete this target group? This action cannot be undone.</p>
+
+        {% with prices=object.prices.count %}
+            {% if prices %}
+                <div class="alert alert-warning">
+                    This target group has {{ prices }} price{{ prices|pluralize }}
+                    and cannot be deleted until they are removed.
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="post">
+            {% csrf_token %}
+            {% include 'partials/_form_fields.html' %}
+
+            <button type="submit" class="btn btn-danger">Yes, delete</button>
+            <a href="{% url 'pricing:group-detail' object.pk %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

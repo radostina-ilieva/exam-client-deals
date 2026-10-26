@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from clients.models import Sector, Client
 from general.mixins import DisableFieldsMixin
 
+
+# ----------------------------------------------------- Sector Forms
 class SectorBaseForm(forms.ModelForm):
     class Meta:
         model = Sector
@@ -49,7 +51,7 @@ class SectorEditForm(SectorBaseForm):
 class SectorDeleteForm(DisableFieldsMixin, SectorBaseForm):
     ...
 
-
+# ----------------------------------------------------- Client Forms
 class ClientBaseForm(forms.ModelForm):
     class Meta:
         model = Client

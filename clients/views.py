@@ -10,6 +10,7 @@ from clients.models import Sector, Client
 from clients.forms import ClientCreateForm, ClientEditForm, ClientDeleteForm, SectorCreateForm, SectorEditForm, SectorDeleteForm
 from general.mixins import GetFormInstanceMixin
 
+# ----------------------------------------------------- Sector Views
 class SectorHomeListView(ListView):
     model = Sector
     paginate_by = 25
@@ -64,6 +65,8 @@ class SectorDetailView(DetailView):
     model = Sector
     template_name = 'sectors/sector_detail.html'
 
+
+# ----------------------------------------------------- Client Views
 class ClientHomeListView(ListView):
     model = Client
     paginate_by = 10
