@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load pricing_extras %}
+
+{% block title %}Offer #{{ offer.pk }}{% endblock %}
+
+{% block content %}
+<div class="p-4 mb-4 bg-light rounded-3 form-card">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-2">Offer #{{ offer.pk }}</h1>
+            <span class="badge bg-secondary">{{ offer.get_status_display }}</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'deals:offer-edit' offer.pk %}" class="btn btn-primary">Edit</a>
+            <a href="{% url 'deals:offer-delete' offer.pk %}" class="btn btn-outline-danger">Delete</a>
+        </div>
+    </div>
+
+    <h2 class="h5">Offer information</h2>
+    <dl class="row">
+        <dt class="col-sm-4">Client</dt><dd class="col-sm-8">{{ offer.client.name }}</dd>
+        <dt class="col-sm-4">Pricing year</dt><dd class="col-sm-8">{{ offer.pricing_year.year }}</dd>
+        <dt class="col-sm-4">Target group</dt><dd class="col-sm-8">{{ offer.target_group.name }}</dd>
+        <dt class="col-sm-4">Prime time</dt><dd class="col-sm-8">{{ offer.pt_percent }}%</dd>
+        <dt class="col-sm-4">Channel split bTV/TC</dt><dd class="col-sm-8">{{ offer.main_channel_percent }}%</dd>
+        <dt class="col-sm-4">Status</dt><dd class="col-sm-8">{{ offer.get_status_display }}</dd>
+        <dt class="col-sm-4">Created</dt><dd class="col-sm-8">{{ offer.created_at|date:"d.m.Y H:i" }}</dd>
+        <dt class="col-sm-4">Notes</dt><dd class="col-sm-8">{{ offer.notes|default:"—"|linebreaksbr }}</dd>
+    </dl>
+
+    <hr>
+    <h2 class="h5">Saved price calculation</h2>
+    <dl class="row">
+        <dt class="col-sm-4">Base price</dt><dd class="col-sm-8">{{ offer.base_price|money }}</dd>
+        <dt class="col-sm-4">Prime time index</dt><dd class="col-sm-8">{{ offer.pt_index }}</dd>
+        <dt class="col-sm-4">Channel split index</dt><dd class="col-sm-8">{{ offer.channel_split_index }}</dd>
+        <dt class="col-sm-4">Adjusted price</dt><dd class="col-sm-8">{{ offer.adjusted_price|floatformat:2 }}</dd>
+        <dt class="col-sm-4">Average price</dt><dd class="col-sm-8"><strong>{{ offer.average_price|money }}</strong></dd>
+    </dl>
+    <a href="{% url 'deals:offer-list' %}" class="btn btn-outline-secondary mt-2">Back to offers</a>
+</div>
+{% endblock %}

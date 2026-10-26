@@ -88,7 +88,7 @@ class PricingHomeView(TemplateView):
 class PricingYearListView(ListView):
     model = PricingYear
     paginate_by = 25
-    template_name = 'years/year_list.html'
+    template_name = 'years/years.html'
     context_object_name = 'years'
 
     def get_queryset(self):
@@ -174,7 +174,7 @@ class PricingYearDeleteView(ProtectedDeleteMixin, GetFormInstanceMixin, DeleteVi
 class ChannelListView(ListView):
     model = Channel
     paginate_by = 25
-    template_name = 'channels/channel_list.html'
+    template_name = 'channels/channels.html'
     context_object_name = 'channels'
 
     def get_queryset(self):
@@ -229,7 +229,7 @@ class ChannelDeleteView(ProtectedDeleteMixin, GetFormInstanceMixin, DeleteView):
 class TargetGroupListView(ListView):
     model = TargetGroup
     paginate_by = 25
-    template_name = 'groups/group_list.html'
+    template_name = 'groups/groups.html'
     context_object_name = 'groups'
 
     def get_queryset(self):
@@ -302,7 +302,7 @@ class TargetGroupDeleteView(ProtectedDeleteMixin, GetFormInstanceMixin, DeleteVi
 class TargetGroupPriceListView(FilterQueryMixin, ListView):
     model = TargetGroupPrice
     paginate_by = 25
-    template_name = 'prices/price_list.html'
+    template_name = 'prices/prices.html'
     context_object_name = 'prices'
 
     # Only these values are accepted from ?ordering=
@@ -428,7 +428,7 @@ class YearCoefficientsView(FormView):
 class IndexBandListView(FilterQueryMixin, ListView):
     model = IndexBand
     paginate_by = 25
-    template_name = 'bands/band_list.html'
+    template_name = 'bands/bands.html'
     context_object_name = 'bands'
 
     def get_queryset(self):

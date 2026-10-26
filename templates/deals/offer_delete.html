@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load pricing_extras %}
+
+{% block title %}Delete offer #{{ object.pk }}{% endblock %}
+
+{% block content %}
+<div class="p-4 mb-4 bg-light rounded-3 form-card">
+    <h1 class="h2 fw-bold mb-3">Delete offer #{{ object.pk }}</h1>
+    <div class="alert alert-warning">
+        Are you sure you want to delete the offer for <strong>{{ object.client.name }}</strong>
+        ({{ object.pricing_year.year }} / {{ object.target_group.name }}) with average price
+        <strong>{{ object.average_price|money }}</strong>?
+        This action cannot be undone.
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        {% include 'partials/_form_fields.html' %}
+        <button type="submit" class="btn btn-danger">Yes, delete offer</button>
+        <a href="{% url 'deals:offer-detail' object.pk %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

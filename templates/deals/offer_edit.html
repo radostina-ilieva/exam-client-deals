@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit offer #{{ object.pk }}{% endblock %}
+
+{% block content %}
+<div class="p-4 mb-4 bg-light rounded-3 form-card">
+    <h1 class="h2 fw-bold mb-2">Edit offer #{{ object.pk }}</h1>
+    <p class="text-muted mb-4">The client, pricing year, target group and percentages are locked to preserve the original price calculation. You can change the status and notes.</p>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% include 'partials/_form_fields.html' %}
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a href="{% url 'deals:offer-detail' object.pk %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

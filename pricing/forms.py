@@ -346,8 +346,8 @@ class PriceCalculatorForm(forms.Form):
         error_messages={
             'required': 'Please enter the prime time share.',
             'invalid': 'Enter a valid number.',
-            'min_value': 'The share cannot be below 0.',
-            'max_value': 'The share cannot be above 100.',
+            'min_value': 'The Prime time (%) cannot be below 0.',
+            'max_value': 'The Prime time (%) cannot be above 100.',
         },
     )
     main_channel_percent = forms.DecimalField(
@@ -363,8 +363,8 @@ class PriceCalculatorForm(forms.Form):
         error_messages={
             'required': 'Please enter the main channel share.',
             'invalid': 'Enter a valid number.',
-            'min_value': 'The share cannot be below 0.',
-            'max_value': 'The share cannot be above 100.',
+            'min_value': 'The Channel split (%) cannot be below 0.',
+            'max_value': 'The Channel split (%) cannot be above 100.',
         },
     )
 
