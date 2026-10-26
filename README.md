@@ -1,202 +1,214 @@
-# Client Deal App.
+# Client Deals
 
-**A Django web application for managing clients, pricing data, and
-commercial offers. It includes a pricing calculator that shows price breakdown.**
+A Django web application for pricing TV advertising deals. It stores the yearly
+price conditions, calculates the price of a deal for a chosen target group, and
+saves the result as an **offer** for a client.
+
+> This project was created as a Django Basics exam project. All data in the
+> examples is fictitious.
+
+## What the application does
+
+1. **Clients** are grouped by **sector**.
+2. **Pricing conditions are set once per pricing year**: base price per target
+   group, prime time and channel split indexes, and 12 monthly coefficients.
+3. The **price calculator** turns those conditions into a full price breakdown.
+4. An **offer** ties a client to one calculation and keeps a **snapshot** of the
+   calculated prices, so an old offer never changes when the conditions of a
+   year are edited later.
+
+## Technology
+
+- Python and Django
+- SQLite (default database, no setup needed)
+- Bootstrap 5 (CSS only) and a custom stylesheet (`static/css/style.css`)
+- Django Template Engine with a base template and partial templates
+- No JavaScript is used anywhere in the project
 
 ## Features
 
-### Client and Sector management
+### Clients and sectors (`clients`)
 
--   Create, view, edit, and delete clients and sectors.
--   Organize clients by sector.
--   View sector details and the number of clients associated with each
-    sector.
--   Prevent deletion of records that are still referenced by other
-    records where the data model requires protection.
+- Full create, read, update, delete for clients and sectors.
+- Search by name, pagination, and a detail page per client and per sector.
+- The client page lists all clients and sectors assigned to them.
+- A sector that still has clients cannot be deleted.
 
-### Pricing configuration
+### Pricing setup (`pricing`)
 
--   Manage pricing years.
--   Manage channels and target groups.
--   Associate channels with target groups.
--   Maintain base prices for target groups by pricing year.
--   Configure monthly coefficients for each pricing year.
--   Configure index bands for Prime Time and Channel Split indexes.
+- **Pricing years**: one record per year, with a readiness overview (how many
+  prices, monthly coefficients and index bands each year has).
+- **Channels** and **target groups**. Every target group is linked to the
+  channels it can be sold on (many-to-many).
+- **Base prices**: one price per target group and year, with filtering by year
+  and group and sorting by group, price or year.
+- **Monthly coefficients**: all 12 months of a year are edited on one page.
+- **Index bands** for two index types: *Prime time* and *Channel split*.
+- A guided home page (`/pricing/`) lists the setup steps with live counters.
 
-### Price calculator
+### Price calculator (`pricing`)
 
-The calculator uses the following approach:
+The calculator shows every step of the price:
 
-``` text
-Base price = calculator gets the price according to: year, target group, prime time % and channel split %
-Adjusted price = Base price × Prime Time index × Channel Split index
-Monthly price  = Adjusted price × Monthly coefficient
-Average price  = Average of the 12 monthly prices
+```text
+Base price                  (year + target group)
+x Prime time index          (looked up by the prime time %)
+x Channel split index       (looked up by the main channel %)
+= Adjusted price
+x Monthly coefficient       -> price for each of the 12 months
+Average of the 12 months    -> average year price (rounded to 2 decimals)
 ```
 
-The calculator validates the supplied percentages and requires a base
-price, index bands, and all 12 monthly coefficients for the selected
-pricing year.
+**Index bands.** Each band stores an upper limit ("up to X%") and a
+coefficient. For a given percentage the calculator uses the band with the
+smallest upper limit that is greater than or equal to the percentage. Every
+year needs a band with an upper limit of 100 for each index type.
 
-### Offer management
+**Example (fictitious numbers).** Base price 285.00, prime time 55 % (index
+1.00), channel split 70 % (index 1.00), monthly coefficients
+1.00, 1.15, 1.30, 1.35, 1.35, 1.35, 1.00, 1.00, 1.30, 1.50, 1.50, 1.30:
+the adjusted price is 285.00 and the average year price is **358.63**.
 
--   Create offers for clients using a pricing year and target group.
--   Save the selected Prime Time and main-channel percentages.
--   Store a snapshot of the calculated pricing values on the offer.
--   List offers and view individual offer details.
--   Edit offer status and notes.
--   Delete offers after confirmation.
+If something is missing (no base price, no band, a missing month), the
+calculator shows a clear message instead of failing.
 
-Offer pricing is stored as a snapshot when the offer is created. Editing
-an offer does not automatically recalculate its stored prices.
+### Offers (`deals`)
 
-## Technology stack
-
--   Python
--   Django
--   SQLite (default development database)
--   Bootstrap 5
--   HTML and CSS
-
-The project styling is maintained in `static/css/style.css`. The
-interface uses a teal-based palette, with `#004F5A` as the primary
-color. The project does not require JavaScript for its Django views or
-CSS styling.
+- Create an offer for a client, a pricing year and a target group, with the
+  prime time % and the main channel %.
+- The price is calculated when the offer is saved and stored as a snapshot
+  (base price, both indexes, adjusted price, average price).
+- List with filters (year, target group) and sorting, detail page, edit and
+  delete with confirmation.
+- Only the **status** (Draft, Sent, Accepted, Rejected) and the **notes** can be
+  edited. To change the calculation, create a new offer.
 
 ## Project structure
 
-``` text
+```text
 .
-├── ExamClientDeals/       # Django project settings and root URL configuration
-├── clients/               # Client and sector management
-├── deals/                 # Offer model, forms, views, and URLs
-├── pricing/               # Pricing models, configuration, and calculator
-├── general/                # Home page and shared helpers
-├── templates/              # Shared and app templates
-│   ├── clients/
-│   ├── deals/
-│   ├── partials/
-│   ├── pricing/
-│   └── ...
-├── static/
-│   └── css/style.css       # Main stylesheet
+├── ExamClientDeals/     Django project: settings and root URLs
+├── general/             Home page and shared view/form mixins
+├── clients/             Sector and Client models, forms, views
+├── pricing/             Pricing models, calculator service, forms, views,
+│                        custom exceptions and template tags
+├── deals/               Offer model, forms and views
+├── templates/           base.html, home.html, 404.html, calculator.html,
+│   ├── partials/        navigation, footer, form fields, pagination,
+│   │                    price breakdown
+│   └── ...              one folder per section (clients, sectors, years,
+│                        channels, groups, prices, bands, deals, pricing)
+├── static/css/          style.css
 ├── manage.py
 └── requirements.txt
 ```
 
-## Requirements
+The price logic lives in `pricing/services.py` and does not depend on views or
+templates. Both the calculator page and the offer form use the same function.
 
--   Python compatible with the Django version pinned in
-    `requirements.txt`
--   `pip`
+## Getting started
 
-Install the exact dependencies listed by the project:
+Requirements: Python 3 and `pip`.
 
-``` bash
-python -m pip install -r requirements.txt
-```
-
-## Setup and run locally
+**No environment variables are required.** The project runs with its default
+settings and a local SQLite database.
 
 ### 1. Create and activate a virtual environment
 
-**Windows (PowerShell):**
+Windows (PowerShell):
 
-``` powershell
+```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-**macOS / Linux:**
+macOS / Linux:
 
-``` bash
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Install dependencies
+### 2. Install the dependencies
 
-``` bash
-python -m pip install --upgrade pip
+```bash
 python -m pip install -r requirements.txt
 ```
 
-### 3. Apply database migrations
+### 3. Create the database
 
-``` bash
+```bash
 python manage.py migrate
 ```
 
-If you have changed Django models and need to create new migrations,
-run:
+### 4. Run the application
 
-``` bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-### 4. Create an administrator account (optional)
-
-``` bash
-python manage.py createsuperuser
-```
-
-### 5. Start the development server
-
-``` bash
+```bash
 python manage.py runserver
 ```
 
 Open <http://127.0.0.1:8000/> in your browser.
 
+The database starts **empty**. No sample data is included, everything is created
+through the application.
+
+## First-time data setup
+
+Follow these steps in order (the page `/pricing/` shows the same list with
+counters):
+
+1. Create a **pricing year**, for example 2027.
+2. Create one or more **channels**.
+3. Create **target groups** and choose their channels.
+4. Add a **base price** for a target group and the year.
+5. Open the year and enter the **12 monthly coefficients** (between 0.80 and 2.50).
+6. Add **index bands** for *Prime time* and for *Channel split*. Include a band
+   with an upper limit of 100 for each type.
+7. Create a **sector** and a **client**.
+8. Open the **price calculator**, then create an **offer**.
+
 ## Main pages
 
-  Area                URL
-  ------------------- ------------------------
-  Home             `/`
-  Offers           `/deals/`
-  Price calculator `/pricing/calculator/`
-  Pricing setup    `/pricing/`
-  Client setup     `/clients/`
-  Sector setup     `/clients/sectors/`
+| Page | URL |
+|---|---|
+| Home | `/` |
+| Clients | `/clients/` |
+| Sectors | `/clients/sectors/` |
+| Pricing setup | `/pricing/` |
+| Pricing years | `/pricing/years/` |
+| Channels | `/pricing/channels/` |
+| Target groups | `/pricing/target-groups/` |
+| Base prices | `/pricing/prices/` |
+| Index bands | `/pricing/index-bands/` |
+| Price calculator | `/pricing/calculator/` |
+| Offers | `/deals/` |
 
-## Initial pricing setup
+## Technical notes
 
-Before calculating prices or creating offers, configure the required
-pricing data:
+- **Models and relations.** Many-to-one: client to sector, offer to client,
+  year and target group, price to year and target group. Many-to-many: target
+  group to channels. Unique and check constraints protect the data
+  (for example one price per target group and year, percentages between 0 and
+  100).
+- **Money and coefficients** use `DecimalField` and `Decimal`, never floats. The
+  average price is rounded half up.
+- **Forms** validate input and show custom labels, help texts and error
+  messages. Delete forms and the offer edit form use read-only (disabled)
+  fields.
+- **Class-based views** with shared mixins: `DisableFieldsMixin`,
+  `GetFormInstanceMixin`, `ProtectedDeleteMixin`, `FilterQueryMixin`.
+- **Protected deletes.** Records that are still used (a year with prices, a
+  client with offers, and so on) cannot be deleted, and the user sees a message.
+- **Templates.** One base template, reusable partials, a custom 404 page, and
+  custom template tags and filters (`money`, `percent`, `month_name`).
+- **Custom exceptions** (`PricingError` and its subclasses) turn missing pricing
+  data into readable form errors.
 
-1.  Create a pricing year.
-2.  Create at least one channel.
-3.  Create target groups and assign channels to them.
-4.  Add a base price for each required target group and pricing year.
-5.  Configure all 12 monthly coefficients for the pricing year.
-6.  Configure index bands for both Prime Time and Channel Split.
-7.  Open the price calculator and enter the required percentages.
-8.  Create an offer from the offer section.
+## Limitations and ideas for the future
 
-The calculator may report a validation or configuration error if
-required pricing data is missing or the selected percentages are outside
-the supported range.
-
-
-## Configuration and production notes
-
-The included settings are intended for local development. Before
-deploying the application:
-
--   Set `DEBUG = False`.
--   Use a secure, environment-provided `SECRET_KEY`; do not commit
-    production secrets.
--   Configure `ALLOWED_HOSTS`.
--   Configure HTTPS and appropriate security settings.
--   Consider a production database and a deployment-specific
-    static-files setup.
--   Review authentication and authorization requirements for the
-    intended users.
-
-## License
-
-No license is specified in this repository. Add a license file if you
-intend to distribute the project publicly.
-
-
+- No user accounts or permissions yet.
+- Offers hold one calculation each, without a month-by-month table.
+- Discounts, bonuses and agencies are not part of this version.
+- Automated tests are planned.
+- Before any real deployment: set `DEBUG = False`, configure `ALLOWED_HOSTS`,
+  load the `SECRET_KEY` from the environment, and use a production database.
