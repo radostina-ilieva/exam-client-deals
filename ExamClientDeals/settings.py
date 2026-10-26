@@ -34,7 +34,8 @@ ALLOWED_HOSTS = []
 PROJECT_APPS = [
     'clients',
     'pricing',
-    'general'
+    'general',
+    'deals'
 ]
 
 INSTALLED_APPS = [
