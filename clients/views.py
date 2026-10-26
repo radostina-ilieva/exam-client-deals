@@ -1,14 +1,12 @@
-from django.db.models import ProtectedError, Count
-from django.contrib import messages
+from django.db.models import Count
+
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from clients.models import Sector, Client
 from clients.forms import ClientCreateForm, ClientEditForm, ClientDeleteForm, SectorCreateForm, SectorEditForm, SectorDeleteForm
-from general.mixins import GetFormInstanceMixin
+from general.mixins import GetFormInstanceMixin, ProtectedDeleteMixin
 
 # ----------------------------------------------------- Sector Views
 class SectorHomeListView(ListView):
@@ -43,23 +41,17 @@ class SectorEditView(SuccessMessageMixin, UpdateView):
     template_name = 'sectors/sector_edit.html'
     success_message = 'Sector "%(name)s" was edited successfully.'
 
-class SectorDeleteView(GetFormInstanceMixin, DeleteView):
+class SectorDeleteView(ProtectedDeleteMixin, GetFormInstanceMixin, DeleteView):
     model = Sector
     form_class = SectorDeleteForm
     success_url = reverse_lazy('clients:sector-list')
     template_name = 'sectors/sector_delete.html'
-    def form_valid(self, form):
-        try:
-            self.object.delete()
-        except ProtectedError:
-            messages.error(
-                self.request,
-                f'Cannot delete sector "{self.object.name}" because it has clients. '
-                'Reassign or delete them first.'
-            )
-            return redirect('clients:sector-list')
-        messages.success(self.request, f'Sector "{self.object.name}" was deleted successfully.')
-        return HttpResponseRedirect(self.get_success_url())
+
+    success_message = 'Sector "{obj}" was deleted successfully.'
+    protected_message = (
+        'Cannot delete sector "{obj}" because it has clients. '
+        'Reassign or delete them first.'
+    )
 
 class SectorDetailView(DetailView):
     model = Sector
@@ -100,12 +92,17 @@ class ClientEditView(SuccessMessageMixin, UpdateView):
     template_name = 'clients/client_edit.html'
     success_message = 'Client "%(name)s" was edited successfully.'
 
-class ClientDeleteView(SuccessMessageMixin, GetFormInstanceMixin, DeleteView):
+class ClientDeleteView(ProtectedDeleteMixin, GetFormInstanceMixin, DeleteView):
     model = Client
     form_class = ClientDeleteForm
     success_url = reverse_lazy('clients:client-list')
     template_name = 'clients/client_delete.html'
-    success_message = 'Client "%(name)s" was deleted successfully.'
+
+    success_message = 'Client "{obj}" was deleted successfully.'
+    protected_message = (
+        'Cannot delete client "{obj}" because it has existing offers. '
+        'Delete the offers first if you want to remove this client.'
+    )
 
 class ClientDetailView(DetailView):
     model = Client
