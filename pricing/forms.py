@@ -11,6 +11,19 @@ from pricing.models import (
 )
 
 
+class BootstrapCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+    """Bootstrap classes only on the inputs, not on the wrapping <div>."""
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['widget']['attrs'].pop('class', None)  # wrapper <div>: no class
+        return context
+
+    def create_option(self, *args, **kwargs):
+        option = super().create_option(*args, **kwargs)
+        option['attrs']['class'] = 'form-check-input me-2'
+        return option
+
 # ----------------------------------------------------- Year Forms
 class PricingYearForm(forms.ModelForm):
     class Meta:
@@ -88,7 +101,7 @@ class TargetGroupForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'e.g. A18-49',
             }),
-            'channels': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+            'channels': BootstrapCheckboxSelectMultiple(),
         }
         labels = {
             'name': 'Target group name',
